@@ -32,7 +32,7 @@ def get_mongo_client():
 
 
 # Query data with aggregation
-@st.cache_data(ttl=180)  # Cache for 5 minutes
+@st.cache_data(ttl=30)  # Cache for 5 minutes
 def get_data_from_mongo():
     client = get_mongo_client()
     db = client['timeseries_data']
