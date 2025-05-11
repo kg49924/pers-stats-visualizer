@@ -77,6 +77,7 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
         axis=alt.Axis(
             title='Time Usage %', format='%', labelColor='white', titleColor='#4CAF50'
         ),
+        scale=alt.Scale(domain=[0, 100]),
     )
 )
 
