@@ -1,0 +1,16 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./app:/app
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PERS_MONGO_DB=${PERS_MONGO_DB}
