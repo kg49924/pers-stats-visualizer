@@ -11,7 +11,7 @@ from pymongo import MongoClient
 st.set_page_config(layout='wide')
 
 # Auto-refresh setup (add this)
-refresh_interval = 10  # seconds
+refresh_interval = 30  # seconds
 st.markdown(
     f"""
     <meta http-equiv="refresh" content="{refresh_interval}">
@@ -32,7 +32,7 @@ def get_mongo_client():
 
 
 # Query data with aggregation
-@st.cache_data(ttl=10)  # Cache for 5 minutes
+@st.cache_data(ttl=180)  # Cache for 5 minutes
 def get_data_from_mongo():
     client = get_mongo_client()
     db = client['timeseries_data']
