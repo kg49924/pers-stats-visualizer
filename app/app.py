@@ -24,7 +24,6 @@ st.markdown(
 
 
 # Connect to MongoDB
-@st.cache_resource
 def get_mongo_client():
     # Replace with your connection string
     client = MongoClient(os.environ.get('PERS_MONGO_DB', 'mongodb://localhost:27017/'))
