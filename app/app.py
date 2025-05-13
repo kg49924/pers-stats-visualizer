@@ -1,3 +1,4 @@
+from enum import auto
 import streamlit as st
 import os
 import altair as alt
@@ -108,34 +109,40 @@ latest_usage = latest['time_usage_perc'] * 100  # Convert to percentage
 latest_duration = latest['avg_task_duration']
 
 # Simple layered chart
+# Make chart responsive to viewport
 chart = (
     alt.layer(line1, line2)
     .resolve_scale(y='independent')
-    .properties(width='container', height=400)
+    .properties(width='container', height=500)
+    .configure_view(continuousHeight=500, continuousWidth=800)
 )
 
-st.altair_chart(chart, use_container_width=True)
+# Create responsive layout
+col_chart, col_metrics = st.columns([4, 1], gap='medium')
 
-# Create two columns for the metrics
-col1, col2 = st.columns(2)
+with col_chart:
+    # Create container with full height
+    chart_container = st.container()
+    with chart_container:
+        st.altair_chart(chart, use_container_width=True, theme='streamlit')
 
-with col1:
+with col_metrics:
+    # Stack metrics vertically
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 2px;">
-            <h2 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h2>
-            <h1 style="color: #4CAF50; font-size: 40px; margin: 0;">{latest_usage:.1f}%</h1>
+        <div style="text-align: center; padding: 10px; margin-bottom: 20px;">
+            <h3 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h3>
+            <h2 style="color: #4CAF50; font-size: 32px; margin: 0;">{latest_usage:.1f}%</h2>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-with col2:
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 2px;">
-            <h2 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h2>
-            <h1 style="color: #FF5252; font-size: 40px; margin: 0;">{latest_duration:.1f} mins</h1>
+        <div style="text-align: center; padding: 10px;">
+            <h3 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h3>
+            <h2 style="color: #FF5252; font-size: 32px; margin: 0;">{latest_duration:.1f} mins</h2>
         </div>
         """,
         unsafe_allow_html=True,
