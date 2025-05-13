@@ -135,7 +135,7 @@ chart = (
     .resolve_scale(y='independent')
     .properties(
         width='container',
-        height=400,
+        height=600,
         padding={'left': 50, 'right': 50, 'top': 20, 'bottom': 50},
     )
 )
