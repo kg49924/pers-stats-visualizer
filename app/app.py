@@ -122,9 +122,9 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 20px;">
-            <h2 style="color: #4CAF50; margin-bottom: 10px;">Time Usage</h2>
-            <h1 style="color: #4CAF50; font-size: 60px; margin: 0;">{latest_usage:.1f}%</h1>
+        <div style="text-align: center; padding: 2px;">
+            <h2 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h2>
+            <h1 style="color: #4CAF50; font-size: 40px; margin: 0;">{latest_usage:.1f}%</h1>
         </div>
         """,
         unsafe_allow_html=True,
@@ -133,9 +133,9 @@ with col1:
 with col2:
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 20px;">
-            <h2 style="color: #FF5252; margin-bottom: 10px;">Avg Task Duration</h2>
-            <h1 style="color: #FF5252; font-size: 60px; margin: 0;">{latest_duration:.1f} mins</h1>
+        <div style="text-align: center; padding: 2px;">
+            <h2 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h2>
+            <h1 style="color: #FF5252; font-size: 40px; margin: 0;">{latest_duration:.1f} mins</h1>
         </div>
         """,
         unsafe_allow_html=True,
