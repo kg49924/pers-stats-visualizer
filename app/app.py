@@ -64,6 +64,8 @@ base = alt.Chart(df).encode(
             titleColor='white',
             labelAngle=45,
             format='%H:%M, %Y-%m-%d',
+            labelFontSize=12,  # Bigger x-axis labels
+            titleFontSize=16,  # Bigger x-axis title
         ),
     )
 )
@@ -73,7 +75,13 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
     y=alt.Y(
         'time_usage_perc:Q',
         axis=alt.Axis(
-            title='Time Usage %', format='%', labelColor='white', titleColor='#4CAF50'
+            title='Time Usage %',
+            format='%',
+            labelColor='white',
+            titleColor='#4CAF50',
+            labelFontSize=14,  # Bigger y-axis labels
+            titleFontSize=16,  # Bigger y-axis title
+            tickCount=8,  # More tick marks
         ),
         scale=alt.Scale(domain=[0, 1]),
     )
@@ -83,10 +91,21 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
     y=alt.Y(
         'avg_task_duration:Q',
         axis=alt.Axis(
-            title='Avg Task Duration (mins)', labelColor='white', titleColor='#FF5252'
+            title='Avg Task Duration (mins)',
+            labelColor='white',
+            titleColor='#FF5252',
+            labelFontSize=14,  # Bigger y-axis labels
+            titleFontSize=16,  # Bigger y-axis title
+            tickCount=8,  # More tick marks
         ),
     )
 )
+# After creating the chart, add this code:
+
+# Get latest values
+latest = df.iloc[-1]
+latest_usage = latest['time_usage_perc'] * 100  # Convert to percentage
+latest_duration = latest['avg_task_duration']
 
 # Simple layered chart
 chart = (
@@ -96,3 +115,28 @@ chart = (
 )
 
 st.altair_chart(chart, use_container_width=True)
+
+# Create two columns for the metrics
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown(
+        f"""
+        <div style="text-align: center; padding: 20px;">
+            <h2 style="color: #4CAF50; margin-bottom: 10px;">Time Usage</h2>
+            <h1 style="color: #4CAF50; font-size: 60px; margin: 0;">{latest_usage:.1f}%</h1>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+with col2:
+    st.markdown(
+        f"""
+        <div style="text-align: center; padding: 20px;">
+            <h2 style="color: #FF5252; margin-bottom: 10px;">Avg Task Duration</h2>
+            <h1 style="color: #FF5252; font-size: 60px; margin: 0;">{latest_duration:.1f} mins</h1>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
