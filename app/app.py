@@ -74,7 +74,6 @@ def get_data_from_mongo():
 
 
 # Page title
-st.title('Usage and duration trend')
 
 # Get data
 df = get_data_from_mongo()
