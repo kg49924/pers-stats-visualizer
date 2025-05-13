@@ -131,7 +131,7 @@ with col_metrics:
     st.markdown(
         f"""
         <div style="text-align: center; padding: 10px; margin-bottom: 20px;">
-            <h3 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h3>
+            <h4 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h4>
             <h2 style="color: #4CAF50; font-size: 32px; margin: 0;">{latest_usage:.1f}%</h2>
         </div>
         """,
@@ -141,7 +141,7 @@ with col_metrics:
     st.markdown(
         f"""
         <div style="text-align: center; padding: 10px;">
-            <h3 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h3>
+            <h4 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h4>
             <h2 style="color: #FF5252; font-size: 32px; margin: 0;">{latest_duration:.1f} mins</h2>
         </div>
         """,
