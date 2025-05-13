@@ -1,4 +1,3 @@
-from enum import auto
 import streamlit as st
 import os
 import altair as alt
@@ -11,8 +10,35 @@ from pymongo import MongoClient
 # Page config for larger space
 st.set_page_config(layout='wide')
 
-# Auto-refresh setup (add this)
-refresh_interval = 30  # seconds
+# Add custom CSS for better responsive behavior
+st.markdown(
+    """
+<style>
+    /* Make the main container fully responsive */
+    .block-container {
+        padding: 1rem 1rem 10rem;
+        max-width: 100%;
+    }
+    
+    /* Ensure charts scale properly */
+    .vega-embed {
+        width: 100% !important;
+    }
+    
+    /* Responsive metrics container */
+    @media (max-width: 768px) {
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 100% !important;
+        }
+    }
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+# Auto-refresh setup
+refresh_interval = 30
 st.markdown(
     f"""
     <meta http-equiv="refresh" content="{refresh_interval}">
@@ -20,11 +46,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Display current time to confirm refreshes
-# st.write(f'Last updated: {pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")}')
+# [Your existing MongoDB functions remain the same]
 
 
-# Connect to MongoDB
 def get_mongo_client():
     # Replace with your connection string
     client = MongoClient(os.environ.get('PERS_MONGO_DB', 'mongodb://localhost:27017/'))
@@ -49,13 +73,13 @@ def get_data_from_mongo():
     return df
 
 
-# Get data (using sample data as fallback)
-df = get_data_from_mongo()
-
 # Page title
 st.title('Usage and duration trend')
 
+# Get data
+df = get_data_from_mongo()
 
+# Create base chart with improved responsive settings
 base = alt.Chart(df).encode(
     x=alt.X(
         'datetime:T',
@@ -65,13 +89,13 @@ base = alt.Chart(df).encode(
             titleColor='white',
             labelAngle=45,
             format='%H:%M, %Y-%m-%d',
-            labelFontSize=12,  # Bigger x-axis labels
-            titleFontSize=16,  # Bigger x-axis title
+            labelFontSize=12,
+            titleFontSize=16,
         ),
     )
 )
 
-# Lines with better visibility
+# Create lines
 line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
     y=alt.Y(
         'time_usage_perc:Q',
@@ -80,9 +104,9 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
             format='%',
             labelColor='white',
             titleColor='#4CAF50',
-            labelFontSize=14,  # Bigger y-axis labels
-            titleFontSize=16,  # Bigger y-axis title
-            tickCount=8,  # More tick marks
+            labelFontSize=14,
+            titleFontSize=16,
+            tickCount=8,
         ),
         scale=alt.Scale(domain=[0, 1]),
     )
@@ -95,54 +119,48 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
             title='Avg Task Duration (mins)',
             labelColor='white',
             titleColor='#FF5252',
-            labelFontSize=14,  # Bigger y-axis labels
-            titleFontSize=16,  # Bigger y-axis title
-            tickCount=8,  # More tick marks
+            labelFontSize=14,
+            titleFontSize=16,
+            tickCount=8,
         ),
     )
 )
-# After creating the chart, add this code:
-
 # Get latest values
 latest = df.iloc[-1]
-latest_usage = latest['time_usage_perc'] * 100  # Convert to percentage
+latest_usage = latest['time_usage_perc'] * 100
 latest_duration = latest['avg_task_duration']
 
-# Simple layered chart
-# Make chart responsive to viewport
+# Create chart with improved responsive properties
 chart = (
     alt.layer(line1, line2)
     .resolve_scale(y='independent')
-    .properties(width='container', height=500)
-    .configure_view(continuousHeight=500, continuousWidth=800)
+    .properties(
+        width='container',
+        height=400,
+        padding={'left': 50, 'right': 50, 'top': 20, 'bottom': 50},
+    )
 )
 
-# Create responsive layout
-col_chart, col_metrics = st.columns([4, 1], gap='medium')
+# Use more flexible column ratios
+col_chart, col_metrics = st.columns([4, 1], gap='small')
 
 with col_chart:
-    # Create container with full height
-    chart_container = st.container()
-    with chart_container:
+    # Use container for better responsiveness
+    with st.container():
         st.altair_chart(chart, use_container_width=True, theme='streamlit')
 
 with col_metrics:
-    # Stack metrics vertically
     st.markdown(
         f"""
-        <div style="text-align: center; padding: 10px; margin-bottom: 20px;">
-            <h4 style="color: #4CAF50; margin-bottom: 5px;">Time Usage</h4>
-            <h2 style="color: #4CAF50; font-size: 32px; margin: 0;">{latest_usage:.1f}%</h2>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        f"""
-        <div style="text-align: center; padding: 10px;">
-            <h4 style="color: #FF5252; margin-bottom: 5px;">Avg Task Duration</h4>
-            <h2 style="color: #FF5252; font-size: 32px; margin: 0;">{latest_duration:.1f} mins</h2>
+        <div style="padding: 2vh 1vw; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+            <div style="padding: 1vh 0; margin-bottom: 3vh;">
+                <p style="color: #4CAF50; margin: 0; font-size: clamp(14px, 2vw, 20px);">Time Usage</p>
+                <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f}%</h2>
+            </div>
+            <div style="padding: 1vh 0;">
+                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Avg Task Duration</p>
+                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_duration:.1f} mins</h2>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
