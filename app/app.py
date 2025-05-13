@@ -63,7 +63,7 @@ base = alt.Chart(df).encode(
             labelColor='white',
             titleColor='white',
             labelAngle=45,
-            format='%b %d',  # Format: May 08 14:30
+            format='%H:%M, %Y-%m-%d',
         ),
     )
 )
