@@ -158,8 +158,8 @@ with col_metrics:
                 <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f}%</h2>
             </div>
             <div style="padding: 1vh 0;">
-                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Completed in 30 mins</p>
-                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_30_min_task_count:.1f} tasks</h2>
+                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Count (in 30 mins)</p>
+                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_30_min_task_count:.2f} tasks</h2>
             </div>
         </div>
         """,
