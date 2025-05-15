@@ -69,7 +69,8 @@ def get_data_from_mongo():
     df['datetime'] = pd.to_datetime(df['time_ist_raw'])
     # Sort by actual datetime object
     df.sort_values('datetime', inplace=True)
-    df = df[['datetime', 'time_usage_perc', 'avg_task_duration']]
+    df['tasks_in_30_mins'] = df['avg_task_duration'].apply(lambda x: 30 / x)
+    df = df[['datetime', 'time_usage_perc', 'avg_task_duration', 'tasks_in_30_mins']]
     return df
 
 
@@ -113,9 +114,9 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
 
 line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
     y=alt.Y(
-        'avg_task_duration:Q',
+        'tasks_in_30_mins:Q',
         axis=alt.Axis(
-            title='Avg Task Duration (mins)',
+            title='No. of tasks completed in 30 mins',
             labelColor='white',
             titleColor='#FF5252',
             labelFontSize=14,
@@ -127,7 +128,7 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
 # Get latest values
 latest = df.iloc[-1]
 latest_usage = latest['time_usage_perc'] * 100
-latest_duration = latest['avg_task_duration']
+latest_30_min_task_count = latest['tasks_in_30_mins']
 
 # Create chart with improved responsive properties
 chart = (
@@ -157,8 +158,8 @@ with col_metrics:
                 <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f}%</h2>
             </div>
             <div style="padding: 1vh 0;">
-                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Avg Task Duration</p>
-                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_duration:.1f} mins</h2>
+                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Completed in 30 mins</p>
+                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_30_min_task_count:.1f} tasks</h2>
             </div>
         </div>
         """,
