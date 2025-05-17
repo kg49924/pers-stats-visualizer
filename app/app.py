@@ -69,8 +69,8 @@ def get_data_from_mongo():
     df['datetime'] = pd.to_datetime(df['time_ist_raw'])
     # Sort by actual datetime object
     df.sort_values('datetime', inplace=True)
-    df['tasks_in_30_mins'] = df['avg_task_duration'].apply(lambda x: 30 / x)
-    df = df[['datetime', 'time_usage_perc', 'avg_task_duration', 'tasks_in_30_mins']]
+    df['tasks_in_time'] = df['avg_task_duration'].apply(lambda x: 45 / x)
+    df = df[['datetime', 'time_usage_perc', 'avg_task_duration', 'tasks_in_time']]
     return df
 
 
@@ -114,9 +114,10 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
 
 line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
     y=alt.Y(
-        'tasks_in_30_mins:Q',
+        'tasks_in_time:Q',
         axis=alt.Axis(
-            title='No. of tasks completed in 30 mins',
+            title='Task % in 45 mins',
+            format='%',
             labelColor='white',
             titleColor='#FF5252',
             labelFontSize=14,
@@ -128,7 +129,7 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
 # Get latest values
 latest = df.iloc[-1]
 latest_usage = latest['time_usage_perc'] * 100
-latest_30_min_task_count = latest['tasks_in_30_mins']
+tasks_in_45_mins = latest['tasks_in_time'] * 100
 
 # Create chart with improved responsive properties
 chart = (
@@ -155,11 +156,11 @@ with col_metrics:
         <div style="padding: 2vh 1vw; height: 100%; display: flex; flex-direction: column; justify-content: center;">
             <div style="padding: 1vh 0; margin-bottom: 3vh;">
                 <p style="color: #4CAF50; margin: 0; font-size: clamp(14px, 2vw, 20px);">Time Usage</p>
-                <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f}%</h2>
+                <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f} %</h2>
             </div>
             <div style="padding: 1vh 0;">
-                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Count (in 30 mins)</p>
-                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_30_min_task_count:.2f} tasks</h2>
+                <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Task Completion</p>
+                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{tasks_in_45_mins:.1f} %</h2>
             </div>
         </div>
         """,
