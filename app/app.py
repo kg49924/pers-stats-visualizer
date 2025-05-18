@@ -69,8 +69,9 @@ def get_data_from_mongo():
     df['datetime'] = pd.to_datetime(df['time_ist_raw'])
     # Sort by actual datetime object
     df.sort_values('datetime', inplace=True)
-    df['tasks_in_time'] = df['avg_task_duration'].apply(lambda x: 45 / x)
+    df['tasks_in_time'] = df['avg_task_duration'].apply(lambda x: 30 / x)
     df = df[['datetime', 'time_usage_perc', 'avg_task_duration', 'tasks_in_time']]
+    df['target'] = 0.6
     return df
 
 
@@ -116,7 +117,7 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
     y=alt.Y(
         'tasks_in_time:Q',
         axis=alt.Axis(
-            title='Task % in 45 mins',
+            title='Task % in 30 mins',
             format='%',
             labelColor='white',
             titleColor='#FF5252',
@@ -124,6 +125,15 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
             titleFontSize=16,
             tickCount=8,
         ),
+        scale=alt.Scale(domain=[0, 1]),
+    )
+)
+
+line_target = base.mark_line(color='white', strokeDash=[5, 5]).encode(
+    y=alt.Y(
+        'target:Q',
+        axis=None,
+        scale=alt.Scale(domain=[0, 1]),  # Same scale as time_usage_perc
     )
 )
 # Get latest values
@@ -133,7 +143,7 @@ tasks_in_45_mins = latest['tasks_in_time'] * 100
 
 # Create chart with improved responsive properties
 chart = (
-    alt.layer(line1, line2)
+    alt.layer(line1, line2, line_target)
     .resolve_scale(y='independent')
     .properties(
         width='container',
