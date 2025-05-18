@@ -156,11 +156,11 @@ with col_metrics:
         <div style="padding: 2vh 1vw; height: 100%; display: flex; flex-direction: column; justify-content: center;">
             <div style="padding: 1vh 0; margin-bottom: 3vh;">
                 <p style="color: #4CAF50; margin: 0; font-size: clamp(14px, 2vw, 20px);">Time Usage</p>
-                <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{latest_usage:.1f} %</h2>
+                <h2 style="color: #4CAF50; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{int(latest_usage)} %</h2>
             </div>
             <div style="padding: 1vh 0;">
                 <p style="color: #FF5252; margin: 0; font-size: clamp(14px, 2vw, 20px);">Task Completion</p>
-                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{tasks_in_45_mins:.1f} %</h2>
+                <h2 style="color: #FF5252; font-size: clamp(24px, 3vw, 36px); margin: 0.5vh 0;">{int(tasks_in_45_mins)} %</h2>
             </div>
         </div>
         """,
