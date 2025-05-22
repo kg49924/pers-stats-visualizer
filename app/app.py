@@ -105,7 +105,7 @@ def get_all_data():
         if not hist_df.empty or not recent_df.empty
         else pd.DataFrame()
     )
-
+    df = df[df['datetime'] >= datetime.now() - timedelta(days=5)]
     if df.empty:
         return None
 
@@ -123,47 +123,79 @@ df = get_all_data()
 if df is None or df.empty:
     st.error('Unable to fetch data')
     st.stop()
-
-# Create chart
-chart = (
-    alt.layer(
-        alt.Chart(df)
-        .mark_line(color='#4CAF50', strokeWidth=3)
-        .encode(
-            x=alt.X('datetime:T', axis=alt.Axis(format='%H:%M', labelAngle=45)),
-            y=alt.Y(
-                'time_usage_perc:Q',
-                axis=alt.Axis(title='Time Usage %', format='%'),
-                scale=alt.Scale(domain=[0, 0.8]),
-            ),
-        ),
-        alt.Chart(df)
-        .mark_line(color='#FF5252', strokeWidth=3)
-        .encode(
-            x='datetime:T',
-            y=alt.Y(
-                'tasks_in_time:Q',
-                axis=alt.Axis(title='Task % in 30m', format='%'),
-                scale=alt.Scale(domain=[0, 0.8]),
-            ),
-        ),
-        alt.Chart(df)
-        .mark_line(color='white', strokeDash=[5, 5])
-        .encode(
-            x='datetime:T',
+base = alt.Chart(df).encode(
+    x=alt.X(
+        'datetime:T',
+        axis=alt.Axis(
+            title=None,
+            labelColor='white',
+            titleColor='white',
+            labelAngle=45,
+            format='%H:%M, %Y-%m-%d',
+            labelFontSize=10,
+            labelPadding=20,
         ),
     )
-    .resolve_scale(y='independent')
-    .properties(width='container', height=500)
+)
+line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
+    y=alt.Y(
+        'time_usage_perc:Q',
+        axis=alt.Axis(
+            title='Time Usage %',
+            format='%',
+            labelColor='white',
+            titleColor='#4CAF50',
+            labelFontSize=20,
+            titleFontSize=20,
+            tickCount=5,
+        ),
+        scale=alt.Scale(domain=[0, 0.8]),
+    )
 )
 
+line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
+    y=alt.Y(
+        'tasks_in_time:Q',
+        axis=alt.Axis(
+            title='Task % in 30 mins',
+            format='%',
+            labelColor='white',
+            titleColor='#FF5252',
+            labelFontSize=20,
+            titleFontSize=20,
+            tickCount=5,
+        ),
+        scale=alt.Scale(domain=[0, 0.8]),
+    )
+)
+
+line_target = base.mark_line(color='white', strokeDash=[5, 5]).encode(
+    y=alt.Y(
+        'target:Q',
+        axis=None,
+        scale=alt.Scale(domain=[0, 0.8]),  # Same scale as time_usage_perc
+    )
+)
+# Create chart
 # Layout
-col1, col2 = st.columns([4, 1])
+chart = (
+    alt.layer(line1, line2, line_target)
+    .resolve_scale(y='independent')
+    .properties(
+        width='container',
+        height=700,
+        padding={'left': 20, 'right': 20, 'top': 20, 'bottom': 40},
+    )
+)
+# Use more flexible column ratios
+col_chart, col_metrics = st.columns([4, 1], gap='small')
 
-with col1:
-    st.altair_chart(chart, use_container_width=True)
+with col_chart:
+    # Use container for better responsiveness
+    with st.container():
+        st.altair_chart(chart, use_container_width=True, theme='streamlit')
 
-with col2:
+with col_metrics:
     latest = df.iloc[-1]
     st.markdown(
         f"""
