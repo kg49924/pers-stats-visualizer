@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 
 # Page config
 st.set_page_config(
-    layout='wide',
-    initial_sidebar_state='collapsed',
-    page_title='Productivity Dashboard',
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    page_title="Productivity Dashboard",
 )
 
 # Minimal CSS
@@ -35,7 +35,7 @@ st.markdown(
 @st.cache_resource
 def get_mongo_client():
     return MongoClient(
-        os.environ.get('PERS_MONGO_DB', 'mongodb://localhost:27017/'),
+        os.environ.get("PERS_MONGO_DB", "mongodb://localhost:27017/"),
         serverSelectionTimeoutMS=2000,
     )
 
@@ -45,22 +45,22 @@ def get_mongo_client():
 def get_historical_data(cutoff_time):
     try:
         client = get_mongo_client()
-        db = client['timeseries_data']
+        db = client["timeseries_data"]
 
         pipeline = [
-            {'$match': {'time_ist_raw': {'$lt': cutoff_time}}},
+            {"$match": {"time_ist_raw": {"$lt": cutoff_time}}},
             {
-                '$project': {
-                    'datetime': {'$dateFromString': {'dateString': '$time_ist_raw'}},
-                    'time_usage_perc': 1,
-                    'avg_task_duration': 1,
-                    '_id': 0,
+                "$project": {
+                    "datetime": {"$dateFromString": {"dateString": "$time_ist_raw"}},
+                    "time_usage_perc": 1,
+                    "avg_task_duration": 1,
+                    "_id": 0,
                 }
             },
-            {'$sort': {'datetime': 1}},
+            {"$sort": {"datetime": 1}},
         ]
 
-        results = list(db['productivity_charts'].aggregate(pipeline))
+        results = list(db["productivity_charts"].aggregate(pipeline))
         return pd.DataFrame(results) if results else pd.DataFrame()
     except Exception:
         return pd.DataFrame()
@@ -70,22 +70,22 @@ def get_historical_data(cutoff_time):
 def get_recent_data(cutoff_time):
     try:
         client = get_mongo_client()
-        db = client['timeseries_data']
+        db = client["timeseries_data"]
 
         pipeline = [
-            {'$match': {'time_ist_raw': {'$gte': cutoff_time}}},
+            {"$match": {"time_ist_raw": {"$gte": cutoff_time}}},
             {
-                '$project': {
-                    'datetime': {'$dateFromString': {'dateString': '$time_ist_raw'}},
-                    'time_usage_perc': 1,
-                    'avg_task_duration': 1,
-                    '_id': 0,
+                "$project": {
+                    "datetime": {"$dateFromString": {"dateString": "$time_ist_raw"}},
+                    "time_usage_perc": 1,
+                    "avg_task_duration": 1,
+                    "_id": 0,
                 }
             },
-            {'$sort': {'datetime': 1}},
+            {"$sort": {"datetime": 1}},
         ]
 
-        results = list(db['productivity_charts'].aggregate(pipeline))
+        results = list(db["productivity_charts"].aggregate(pipeline))
         return pd.DataFrame(results) if results else pd.DataFrame()
     except Exception:
         return pd.DataFrame()
@@ -105,46 +105,46 @@ def get_all_data():
         if not hist_df.empty or not recent_df.empty
         else pd.DataFrame()
     )
-    df = df[df['datetime'] >= datetime.now() - timedelta(days=5)]
+    df = df[df["datetime"] >= datetime.now() - timedelta(days=7)]
     if df.empty:
         return None
 
     # Process
-    df = df.drop_duplicates(subset=['datetime']).sort_values('datetime')
-    df['tasks_in_time'] = 30 / df['avg_task_duration'].clip(lower=0.1)
-    df['target'] = 0.6
+    df = df.drop_duplicates(subset=["datetime"]).sort_values("datetime")
+    df["tasks_in_time"] = 30 / df["avg_task_duration"].clip(lower=0.1)
+    df["target"] = 0.6
 
-    return df[['datetime', 'time_usage_perc', 'tasks_in_time', 'target']]
+    return df[["datetime", "time_usage_perc", "tasks_in_time", "target"]]
 
 
 # Get data
 df = get_all_data()
 
 if df is None or df.empty:
-    st.error('Unable to fetch data')
+    st.error("Unable to fetch data")
     st.stop()
 base = alt.Chart(df).encode(
     x=alt.X(
-        'datetime:T',
+        "datetime:T",
         axis=alt.Axis(
             title=None,
-            labelColor='white',
-            titleColor='white',
+            labelColor="white",
+            titleColor="white",
             labelAngle=45,
-            format='%H:%M, %Y-%m-%d',
-            labelFontSize=10,
+            format="%Y-%m-%d",
+            labelFontSize=20,
             labelPadding=20,
         ),
     )
 )
-line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
+line1 = base.mark_line(color="#4CAF50", strokeWidth=3).encode(
     y=alt.Y(
-        'time_usage_perc:Q',
+        "time_usage_perc:Q",
         axis=alt.Axis(
-            title='Time Usage %',
-            format='%',
-            labelColor='white',
-            titleColor='#4CAF50',
+            title="Time Usage %",
+            format="%",
+            labelColor="white",
+            titleColor="#4CAF50",
             labelFontSize=20,
             titleFontSize=20,
             tickCount=5,
@@ -153,14 +153,14 @@ line1 = base.mark_line(color='#4CAF50', strokeWidth=3).encode(
     )
 )
 
-line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
+line2 = base.mark_line(color="#FF5252", strokeWidth=3).encode(
     y=alt.Y(
-        'tasks_in_time:Q',
+        "tasks_in_time:Q",
         axis=alt.Axis(
-            title='Task % in 30 mins',
-            format='%',
-            labelColor='white',
-            titleColor='#FF5252',
+            title="Task % in 30 mins",
+            format="%",
+            labelColor="white",
+            titleColor="#FF5252",
             labelFontSize=20,
             titleFontSize=20,
             tickCount=5,
@@ -169,9 +169,9 @@ line2 = base.mark_line(color='#FF5252', strokeWidth=3).encode(
     )
 )
 
-line_target = base.mark_line(color='white', strokeDash=[5, 5]).encode(
+line_target = base.mark_line(color="white", strokeDash=[5, 5]).encode(
     y=alt.Y(
-        'target:Q',
+        "target:Q",
         axis=None,
         scale=alt.Scale(domain=[0, 0.8]),  # Same scale as time_usage_perc
     )
@@ -180,20 +180,20 @@ line_target = base.mark_line(color='white', strokeDash=[5, 5]).encode(
 # Layout
 chart = (
     alt.layer(line1, line2, line_target)
-    .resolve_scale(y='independent')
+    .resolve_scale(y="independent")
     .properties(
-        width='container',
+        width="container",
         height=700,
-        padding={'left': 20, 'right': 20, 'top': 20, 'bottom': 40},
+        padding={"left": 20, "right": 20, "top": 20, "bottom": 40},
     )
 )
 # Use more flexible column ratios
-col_chart, col_metrics = st.columns([4, 1], gap='small')
+col_chart, col_metrics = st.columns([4, 1], gap="small")
 
 with col_chart:
     # Use container for better responsiveness
     with st.container():
-        st.altair_chart(chart, use_container_width=True, theme='streamlit')
+        st.altair_chart(chart, use_container_width=True, theme="streamlit")
 
 with col_metrics:
     latest = df.iloc[-1]
@@ -202,11 +202,11 @@ with col_metrics:
         <div style="height: 100vh; display: flex; flex-direction: column; justify-content: center;">
             <div style="text-align: center;">
                 <h2 class="metric-label" style="color: #4CAF50;">Time Usage</h2>
-                <h1 class="metric-value" style="color: #4CAF50;">{int(latest['time_usage_perc'] * 100)}%</h1>
+                <h1 class="metric-value" style="color: #4CAF50;">{int(latest["time_usage_perc"] * 100)}%</h1>
             </div>
             <div style="text-align: center; margin-top: 3rem;">
                 <h2 class="metric-label" style="color: #FF5252;">Task Completion</h2>
-                <h1 class="metric-value" style="color: #FF5252;">{int(latest['tasks_in_time'] * 100)}%</h1>
+                <h1 class="metric-value" style="color: #FF5252;">{int(latest["tasks_in_time"] * 100)}%</h1>
             </div>
         </div>
     """,
